@@ -2,24 +2,18 @@ package main
 
 import (
 	"fmt"
+	"os"
 	"pgn/pgconf"
 	"pgn/tgapi"
-
-	"github.com/alecthomas/kong"
 )
 
-var CLI struct {
-	Notify struct {
-		Msg string `required help:"Notification text to send"`
-	} `cmd help:"Send a single notification to default contact"`
-}
-
 func main() {
-	conf := pgconf.GetConf()
-	ctx := kong.Parse(&CLI)
-	if ctx.Command() == "notify" {
-		t := tgapi.New(conf.Token, conf.TargetUid)
-		t.SendMessage(CLI.Notify.Msg)
-		fmt.Println("Done!")
+	if len(os.Args) < 2 || os.Args[1] == "" {
+		fmt.Println("Usage: pgn <text>")
+		return
 	}
+	message := os.Args[1]
+	conf := pgconf.GetConf()
+	t := tgapi.New(conf.Token, conf.TargetUid)
+	t.SendMessage(message)
 }
